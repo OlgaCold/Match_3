@@ -1,20 +1,22 @@
 TEMPLATE = lib
 TARGET = Match3
 QT += qml quick
+QT += gui
 CONFIG += plugin c++11
 DESTDIR = Match3
 
 TARGET = $$qtLibraryTarget($$TARGET)
 uri = Match3
 
-# Input
 SOURCES += \
     match3plugin_plugin.cpp \
-    match3.cpp
+    bubble.cpp \
+    gamematch3.cpp
 
 HEADERS += \
     match3plugin_plugin.h \
-    match3.h
+    bubble.h \
+    gamematch3.h
 
 
 !equals(_PRO_FILE_PWD_, $$OUT_PWD) {

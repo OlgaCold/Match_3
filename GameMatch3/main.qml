@@ -3,6 +3,8 @@ import QtQuick.Window 2.3
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
+import Match3 1.0
+
 ApplicationWindow {
 
     id: root
@@ -56,11 +58,11 @@ ApplicationWindow {
         cellWidth: 110
         cellHeight: cellWidth
 
-        model: 4*3
+        model: 12 //Match3 { id: game}
         delegate: BubbleDelegate {
 
             id: bubleDelegate
-            color: "#cd853f"
+            color: "green"//model.decoration
         }
     }
 }

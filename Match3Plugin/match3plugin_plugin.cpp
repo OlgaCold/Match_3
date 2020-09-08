@@ -1,5 +1,5 @@
 #include "match3plugin_plugin.h"
-#include "match3.h"
+#include "gamematch3.h"
 
 #include <qqml.h>
 
