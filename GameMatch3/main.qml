@@ -38,7 +38,7 @@ ApplicationWindow {
         NewGameButton{
             text: "New game"
             textColor: "#8b4513"
-            //onClicked:
+            onClicked: game.newGame()
         }
         Counter{
             text: "score"
@@ -71,5 +71,7 @@ ApplicationWindow {
             bubbleHeight: bubbleWidth
             spacing: marginSize
         }
+
+        onReleased: game.move(clickAt, releasedAt)
     }
 }

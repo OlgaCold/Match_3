@@ -11,6 +11,7 @@
 //#include <QJsonValue>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <cmath>
 #include "bubble.h"
 
 class Match3 : public QAbstractListModel
@@ -34,9 +35,9 @@ public:
     virtual QHash<int, QByteArray> roleNames() const override;
 
     // Basic functionality:
-    /*QModelIndex index(int row, int column,
-                      const QModelIndex &parent = QModelIndex()) const override;
-    QModelIndex parent(const QModelIndex &index) const override;*/
+    //QModelIndex index(int row, int column,
+    //                 const QModelIndex &parent = QModelIndex()) const override;
+    //QModelIndex parent(const QModelIndex &index) const override;*/
 
     /*// Add data:
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
@@ -45,7 +46,9 @@ public:
     // Remove data:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;*/
-
+public slots:
+    void move(int clicked, int released);
+    void newGame();
 
 private:
     int m_rows;
@@ -54,5 +57,6 @@ private:
     QList<QColor> m_colors;
 
     void setStartValues(const QString file);
+    bool checkMove(int from, int to) const;
 
 };
