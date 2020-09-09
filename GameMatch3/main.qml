@@ -9,16 +9,17 @@ ApplicationWindow {
 
     id: root
 
-    property int maxSize
+    property int itemSize: 100
+    property int marginSize: 10
 
     title: qsTr("Match 3")
     visible: true
-    width: 4 * 110 + 20
-    height: 3 * 110 + 100
+    width: game.col < 3 ? 3 * (itemSize + marginSize) + 20 : game.col * (itemSize + marginSize) + 20
+    height: game.row * (itemSize + marginSize) + 100
     color:"#faebd7"
 
-    minimumWidth: 4 * 110 + 20
-    minimumHeight: 3 * 110 + 100
+    minimumWidth: game.col < 3 ? 3 * (itemSize + marginSize) + 20 : game.col * (itemSize + marginSize) + 20
+    minimumHeight: game.row * (itemSize + marginSize) + 100
 
     RowLayout{
 
@@ -31,6 +32,7 @@ ApplicationWindow {
 
         Counter{
             text: "move"
+            countText: "35"
             textColor: "#8b4513"
         }
         NewGameButton{
@@ -40,9 +42,11 @@ ApplicationWindow {
         }
         Counter{
             text: "score"
+            countText: "156"
             textColor: "#8b4513"
         }
     }
+
 
     Board {
 
@@ -52,17 +56,20 @@ ApplicationWindow {
         anchors.verticalCenterOffset: 40
         anchors.horizontalCenter: parent.horizontalCenter
 
-        width: 4 * 110
-        height: 3 * 110
-
-        cellWidth: 110
+        cellWidth: itemSize + marginSize
         cellHeight: cellWidth
+        width: game.col * cellWidth
+        height: game.row * cellHeight
 
-        model: 12 //Match3 { id: game}
+        model: Match3 { id: game}
         delegate: BubbleDelegate {
 
             id: bubleDelegate
-            color: "green"//model.decoration
+
+            color: model.color
+            bubbleWidth: itemSize
+            bubbleHeight: bubbleWidth
+            spacing: marginSize
         }
     }
 }

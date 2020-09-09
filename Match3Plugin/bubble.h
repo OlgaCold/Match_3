@@ -12,10 +12,6 @@ public:
     QColor getColor() const;
     void setColor(QColor color);
 
-signals:
-
-public slots:
-
 private:
     QColor m_color;
 };

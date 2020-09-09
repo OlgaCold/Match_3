@@ -1,10 +1,9 @@
-{
-	"rows": 3,
-	"columns": 4,
-	"colors": [
-        	"red",
-        	"green",
-        	"black",
-        	"white"
-	]
+{   "rows": 4,
+    "columns": 5,
+    "colors": [
+        "black",
+        "green",
+        "blue",
+        "white"
+    ]
 }

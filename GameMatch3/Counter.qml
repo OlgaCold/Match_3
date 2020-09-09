@@ -6,6 +6,7 @@ Rectangle {
     id: root
 
     property alias text: label.text
+    property alias countText: countLabel.text
     property alias textColor: label.color
 
     width: 100

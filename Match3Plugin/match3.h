@@ -1,18 +1,30 @@
 #pragma once
 
 #include <QAbstractListModel>
+#include <QObject>
+#include <QFile>
+#include <QColor>
+#include <QTextStream>
+#include <QDebug>
+#include <QJsonObject>
+#include <QString>
+//#include <QJsonValue>
+#include <QJsonArray>
+#include <QJsonDocument>
 #include "bubble.h"
 
 class Match3 : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(qint32 row MEMBER m_rows CONSTANT)
+    Q_PROPERTY(qint32 col MEMBER m_columns CONSTANT)
 
 public:
     explicit Match3(QObject *parent = nullptr);
-    //~Match3(){}
+    ~Match3();
 
     enum {
-        DecorationRole
+        ColorRole = Qt::UserRole
     };
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -39,5 +51,8 @@ private:
     int m_rows;
     int m_columns;
     QList<Bubble*> m_bubbles;
+    QList<QColor> m_colors;
+
+    void setStartValues(const QString file);
 
 };

@@ -5,9 +5,12 @@ Item {
     id: root
 
     property alias color: item.color
+    property alias bubbleWidth: item.width
+    property alias bubbleHeight: item.height
+    property int spacing
 
-    width: 110
-    height: 110
+    width: bubbleWidth + spacing
+    height: bubbleHeight + spacing
 
     //property alias oldP: mouseArea.oldPosition
     //property alias text: item.text
@@ -19,7 +22,6 @@ Item {
 
         id: item;
         anchors.centerIn: parent
-
     }
 
     /*MouseArea {

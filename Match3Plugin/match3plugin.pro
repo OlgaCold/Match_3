@@ -2,6 +2,7 @@ TEMPLATE = lib
 TARGET = Match3
 QT += qml quick
 QT += gui
+QT += core
 CONFIG += plugin c++11
 DESTDIR = Match3
 
@@ -11,12 +12,12 @@ uri = Match3
 SOURCES += \
     match3plugin_plugin.cpp \
     bubble.cpp \
-    gamematch3.cpp
+    match3.cpp
 
 HEADERS += \
     match3plugin_plugin.h \
     bubble.h \
-    gamematch3.h
+    match3.h
 
 
 !equals(_PRO_FILE_PWD_, $$OUT_PWD) {
@@ -28,6 +29,7 @@ HEADERS += \
 }
 
 qmldir.files = qmldir
+
 unix {
     installPath = $$[QT_INSTALL_QML]/$$replace(uri, \\., /)
     qmldir.path = $$installPath
@@ -38,3 +40,6 @@ unix {
 cpqmldir.files = qmldir
 cpqmldir.path = $$DESTDIR
 COPIES += cpqmldir
+
+DISTFILES += \
+    start_values.json
