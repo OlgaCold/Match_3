@@ -8,15 +8,18 @@ Rectangle{
     property alias delegate: grid.delegate
     property alias cellWidth: grid.cellWidth
     property alias cellHeight: grid.cellHeight
-    property alias clickAt: mouseArea.clickAt
-    property alias releasedAt: mouseArea.releasedAt
+    property int first
+    property int second
+    property int choosed: 0
+    property bool isPressed: false
 
-    //signal clicked
+    signal clicked
     signal released
 
     color: "transparent"
     border.color: "#8b4513"
     border.width: 2
+
 
     GridView {
 
@@ -24,31 +27,37 @@ Rectangle{
         anchors.fill: parent
         interactive: false
 
+        currentIndex: -1
+
         displaced: Transition {
-            NumberAnimation { properties: "x,y"; easing.type: Easing.OutQuad }
+            NumberAnimation { properties: "x,y,"; easing.type: Easing.OutQuad }
         }
         move: Transition {
             NumberAnimation { properties: "x,y"; easing.type: Easing.OutQuad }
         }
 
-        MouseArea {
+
+
+        /*MouseArea {
 
             id: mouseArea
 
             property int clickAt
             property int releasedAt
 
+
+
             anchors.fill: parent
 
             onPressed: {
                 clickAt = parent.indexAt(mouseX, mouseY)
-                //root.clicked();
+                root.clicked();
             }
 
             onReleased: {
                 releasedAt = parent.indexAt(mouseX, mouseY)
                 root.released();
             }
-        }
+        }*/
     }
 }

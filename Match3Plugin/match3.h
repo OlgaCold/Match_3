@@ -26,6 +26,7 @@ public:
 
     enum {
         ColorRole = Qt::UserRole
+        //SizeRole = Qt::UserRole + 1
     };
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -47,8 +48,10 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;*/
 public slots:
+    void clickHandler(int index);
     void move(int clicked, int released);
     void newGame();
+
 
 private:
     int m_rows;
@@ -58,5 +61,6 @@ private:
 
     void setStartValues(const QString file);
     bool checkMove(int from, int to) const;
+    void connectedBlocks(int clicked, int released);
 
 };

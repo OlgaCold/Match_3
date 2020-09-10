@@ -16,7 +16,7 @@ ApplicationWindow {
     visible: true
     width: game.col < 3 ? 3 * (itemSize + marginSize) + 20 : game.col * (itemSize + marginSize) + 20
     height: game.row * (itemSize + marginSize) + 100
-    color:"#faebd7"
+    color: "#faebd7"
 
     minimumWidth: game.col < 3 ? 3 * (itemSize + marginSize) + 20 : game.col * (itemSize + marginSize) + 20
     minimumHeight: game.row * (itemSize + marginSize) + 100
@@ -67,11 +67,41 @@ ApplicationWindow {
             id: bubleDelegate
 
             color: model.color
+            spacing: marginSize
             bubbleWidth: itemSize
             bubbleHeight: bubbleWidth
-            spacing: marginSize
-        }
 
-        onReleased: game.move(clickAt, releasedAt)
+            state: board.isPressed && marked? "small" : "normal"
+            onClick: {
+
+                board.choosed = board.choosed + 1
+
+                if(board.choosed === 1)
+                {
+                    board.first = index
+                    board.isPressed = true
+                    marked = true
+                }
+
+                if(board.choosed === 2)
+                {
+                    board.second = index
+                    game.move(board.first, board.second)
+                    marked = true
+                }
+
+            }
+            onRelease: {
+
+                if(board.choosed === 2) {
+
+                    board.isPressed = false
+                    board.choosed = 0
+                    marked = false
+                }
+
+            }
+
+        }
     }
 }

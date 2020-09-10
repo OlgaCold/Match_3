@@ -7,9 +7,11 @@ Item {
     property alias color: item.color
     property alias bubbleWidth: item.width
     property alias bubbleHeight: item.height
-    //property alias clickAt: mouseArea.clickAt
-    //property alias releasedAt: mouseArea.releasedAt
-    property int spacing
+    property bool marked: false
+    state: "normal"
+    property alias spacing: item.spacing
+    signal click
+    signal release
 
     width: bubbleWidth + spacing
     height: bubbleHeight + spacing
@@ -17,6 +19,40 @@ Item {
     Bubble {
 
         id: item;
+        property int spacing
         anchors.centerIn: parent
+
+    }
+
+    states: [
+        State {
+            name: "small"
+            PropertyChanges { target: item; width: 80; height: 80; spacing: 30}
+        },
+        State {
+            name: "normal"
+            PropertyChanges { target: item; width: 100; height: 100; spacing: 10}
+        }
+    ]
+    transitions: Transition {
+        from: "normal"; to: "small"
+        reversible: true
+        ParallelAnimation {
+            NumberAnimation { properties: "width, height, spacing"; duration: 100; easing.type: Easing.Linear }
+        }
+    }
+
+    MouseArea {
+        id: mouseArea
+
+        anchors.fill: parent
+
+        pressAndHoldInterval: 0
+
+        onPressAndHold: {
+
+            root.click()
+        }
+        onReleased: { root.release() }
     }
 }

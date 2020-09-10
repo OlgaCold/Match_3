@@ -14,3 +14,4 @@ void Bubble::setColor(QColor color)
 {
     m_color = color;
 }
+
