@@ -21,7 +21,7 @@ if [ ! -d $BUILD_DIR ]; then
 fi
 
 cd Match3Plugin
-cp start_values.json ../build
+cp start_values.json ../
 
 cd ../build
 

@@ -16,7 +16,7 @@ ApplicationWindow {
     visible: true
     width: game.col < 3 ? 3 * (itemSize + marginSize) + 20 : game.col * (itemSize + marginSize) + 20
     height: game.row * (itemSize + marginSize) + 100
-    color:"#faebd7"
+    color: "#faebd7"
 
     minimumWidth: game.col < 3 ? 3 * (itemSize + marginSize) + 20 : game.col * (itemSize + marginSize) + 20
     minimumHeight: game.row * (itemSize + marginSize) + 100
@@ -60,6 +60,7 @@ ApplicationWindow {
         cellHeight: cellWidth
         width: game.col * cellWidth
         height: game.row * cellHeight
+        myState: choosed == 2 ?  "small" : "normal"
 
         model: Match3 { id: game}
         delegate: BubbleDelegate {
@@ -67,11 +68,37 @@ ApplicationWindow {
             id: bubleDelegate
 
             color: model.color
+            spacing: marginSize
             bubbleWidth: itemSize
             bubbleHeight: bubbleWidth
-            spacing: marginSize
-        }
+            state: isPressed ? board.myState : "normal"//board.myState//
+            onClick: {
 
-        onReleased: game.move(clickAt, releasedAt)
+                //state = "small"
+                isPressed = true
+                board.choosed = board.choosed + 1
+
+                if(board.choosed === 1)
+                {
+                    board.first = index
+
+                }
+
+                if(board.choosed === 2)
+                {
+                    board.second = index
+                    game.move(board.first, board.second)
+                }
+
+            }
+            onRelease: {
+
+                if(board.choosed === 2) {
+                    isPressed = false
+                    board.choosed = 0
+                }
+            }
+
+        }
     }
 }

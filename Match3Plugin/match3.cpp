@@ -35,6 +35,8 @@ QVariant Match3::data(const QModelIndex &index, int role) const
     switch(role) {
     case ColorRole:
         return m_bubbles.at(row)->getColor();
+    /*case SizeRole:
+        return m_bubbles.at(row)->getSize();*/
     }
     return QVariant();
 }
@@ -42,7 +44,41 @@ QVariant Match3::data(const QModelIndex &index, int role) const
 
 QHash<int, QByteArray> Match3::roleNames() const
 {
-    return {{ ColorRole, "color" }};
+    return {
+        { ColorRole, "color" },
+        /*{SizeRole, "size"}*/ };
+}
+
+void Match3::clickHandler(int index)
+{
+    static int choosed = 0;
+    static int first = -1;
+    static int second = -1;
+
+    choosed++;
+
+    //beginResetModel();
+    //m_bubbles.at(index)->setSize("small");
+    //endResetModel();
+
+    if(choosed == 1)
+    {
+        first = index;
+    }
+
+    if(choosed == 2)
+    {
+        second = index;
+        choosed = 0;
+
+        move(first, second);
+
+        //m_bubbles.at(first)->setSize(100);
+        //m_bubbles.at(second)->setSize(100);
+
+        first = -1;
+        second = -1;
+    }
 }
 
 void Match3::move(int clicked, int released)
@@ -137,11 +173,26 @@ bool Match3::checkMove(int from, int to) const
     int to_col = to % m_columns;
     //printf("%d, %d  %d, %d\n", from_row, from_col, to_row, to_col);
 
-    if(abs( (from_row + from_col) - (to_row + to_col) ) == 1){
+    if( (abs(from_row - to_row) == 1 && abs(from_col - to_col) == 0) ||
+        (abs(from_col - to_col) == 1 && abs(from_row - to_row) == 0)){
         return true;
     } else { return false; }
 
 }
+
+/*void Match3::connectedBlocks(int clicked, int released)
+{
+    int from_row = floor(from / m_columns);
+    int from_col = from % m_columns;
+    int to_row = floor(to / m_columns);
+    int to_col = to % m_columns;
+
+    static row_connected = 1;
+    static col_connected = 1;
+
+
+
+}*/
 
 /*
 
