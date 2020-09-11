@@ -8,10 +8,14 @@ Rectangle{
     property alias delegate: grid.delegate
     property alias cellWidth: grid.cellWidth
     property alias cellHeight: grid.cellHeight
+    //property alias clickAt: mouseArea.clickAt
+    //property alias releasedAt: mouseArea.releasedAt
     property int first
     property int second
     property int choosed: 0
     property bool isPressed: false
+    //property bool gameStarted: false
+    //property string myState
 
     signal clicked
     signal released

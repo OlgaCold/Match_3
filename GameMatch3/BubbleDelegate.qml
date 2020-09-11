@@ -12,6 +12,7 @@ Item {
     property alias spacing: item.spacing
     signal click
     signal release
+    //signal choosedTwoItems
 
     width: bubbleWidth + spacing
     height: bubbleHeight + spacing
@@ -44,6 +45,10 @@ Item {
 
     MouseArea {
         id: mouseArea
+
+        //property int clickAt
+        //property int first
+        //property int second
 
         anchors.fill: parent
 
