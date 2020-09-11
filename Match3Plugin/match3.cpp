@@ -8,8 +8,10 @@ Match3::Match3(QObject *parent)
 
     for(int i = 0; i < m_rows * m_columns; i++){
 
-        m_bubbles.append(new Bubble(nullptr, m_colors.at(qrand() % m_colors.size())));
+        m_bubbles.append(new Bubble(nullptr, m_colors.at(qrand() % m_colors.size()), false));
     }
+
+    //printf("%d ", connectedBlocks(3));
 }
 
 Match3::~Match3(){
@@ -49,7 +51,7 @@ QHash<int, QByteArray> Match3::roleNames() const
         /*{SizeRole, "size"}*/ };
 }
 
-void Match3::clickHandler(int index)
+/*void Match3::clickHandler(int index)
 {
     static int choosed = 0;
     static int first = -1;
@@ -79,12 +81,10 @@ void Match3::clickHandler(int index)
         first = -1;
         second = -1;
     }
-}
+}*/
 
 void Match3::move(int clicked, int released)
 {
-    //printf("clicked at %d, released at %d\n", clicked, released);
-
     if(released != -1 && clicked != released && checkMove(clicked, released)) {
 
         int min = clicked < released ? clicked : released;
@@ -99,10 +99,66 @@ void Match3::move(int clicked, int released)
             m_bubbles.move(max - 1, min);
             emit endMoveRows();
         }
+    }
 
-        //return checkWin();
+}
+bool Match3::moveHandler(int clicked, int released)
+{
+    //printf("clicked at %d, released at %d\n", clicked, released);
+
+    int row_1 = floor(clicked / m_columns);
+    int col_1 = clicked % m_columns;
+    int row_2 = floor(released / m_columns);
+    int col_2 = released % m_columns;
+
+    int clickedConnected = 0;
+    int releasedConnected = 0;
+
+    move(clicked, released);
+
+    //printf("%d ", connectedBlocks(row_2, col_2, m_bubbles.at(released)->getColor()));
+    //printf("%d\n",connectedBlocks(row_1, col_1, m_bubbles.at(clicked)->getColor()));
+
+
+    clickedConnected = connectedBlocks(row_1, col_1, m_bubbles.at(clicked)->getColor());
+
+    /*if (clickedConnected >= 3) {
+
+        for(int i = 0; i < m_toDelete.count(); i++){
+
+            m_bubbles.at(m_toDelete.at(i))->setMarkedToDelete(true);
+        }
+        m_toDelete.clear();
+    }*/
+
+    releasedConnected = connectedBlocks(row_2, col_2, m_bubbles.at(released)->getColor());
+    /*if (releasedConnected >= 3) {
+        for(int i = 0; i < m_toDelete.count(); i++){
+            m_bubbles.at(m_toDelete.at(i))->setMarkedToDelete(true);
+        }
+        m_toDelete.clear();
+    }*/
+
+    if( clickedConnected >= 3 || releasedConnected >= 3 ) {
+
+        deleteBlocks();
+
+        for(int i = 0; i < m_bubbles.count(); i++){
+            m_bubbles.at(i)->setMarkedToDelete(false);
+        }
+        return true;
+
+    } else {
+
+        move(clicked, released);
+
+        for(int i = 0; i < m_bubbles.count(); i++){
+            m_bubbles.at(i)->setMarkedToDelete(false);
+        }
+        return false;
     }
 }
+
 
 void Match3::newGame()
 {
@@ -112,7 +168,7 @@ void Match3::newGame()
     }
     for(int i = 0; i < m_rows * m_columns; i++){
 
-        m_bubbles.append(new Bubble(nullptr, m_colors.at(qrand() % m_colors.size())));
+        m_bubbles.append(new Bubble(nullptr, m_colors.at(qrand() % m_colors.size()), false));
     }
 
     //std::random_shuffle(m_bubbles.begin(), m_bubbles.end());
@@ -180,19 +236,49 @@ bool Match3::checkMove(int from, int to) const
 
 }
 
-/*void Match3::connectedBlocks(int clicked, int released)
+int Match3::connectedBlocks(int row, int col, QColor color)
 {
-    int from_row = floor(from / m_columns);
-    int from_col = from % m_columns;
-    int to_row = floor(to / m_columns);
-    int to_col = to % m_columns;
 
-    static row_connected = 1;
-    static col_connected = 1;
+    if(row >= m_rows || col >= m_columns || row < 0 || col < 0)
+    {
+        return 0; }
+
+    if(m_bubbles.at(row * m_columns + col )->getMarkedToDelete() == true)//if(m_toDelete.contains(row * m_columns + col))
+    {
+        return 0; }
+
+    if(m_bubbles.at(row * m_columns + col)->getColor() != color)
+    {
+        return 0; }
+
+    int connected_blocks = 1;
+    //m_toDelete.append(row * m_columns + col);
+
+    m_bubbles.at(row * m_columns + col)->setMarkedToDelete(true);
+    //printf("%d , %d ", row, col);
+    //printf(m_bubbles.at(row * m_columns + col)->getMarkedToDelete() ? "true " : "false ");
 
 
+    connected_blocks += connectedBlocks(row + 1, col, color);
+    connected_blocks += connectedBlocks(row - 1, col, color);
+    connected_blocks += connectedBlocks(row, col + 1, color);
+    connected_blocks += connectedBlocks(row, col - 1, color);
 
-}*/
+    return connected_blocks;
+
+}
+
+void Match3::deleteBlocks()
+{
+    for(int i = 0; i < m_rows; i++){
+        for(int j = 0; j < m_columns; j++){
+            printf(m_bubbles.at(i * m_columns + j)->getMarkedToDelete() ? "true " : "false ");
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
 
 /*
 

@@ -8,14 +8,15 @@ class Bubble : public QObject
 {
     Q_OBJECT
 public:
-    explicit Bubble(QObject *parent = nullptr, QColor color = "black");
+    explicit Bubble(QObject *parent = nullptr, QColor color = "black", bool markedToDelete = false);
 
     QColor getColor() const;
     void setColor(QColor color);
-    //int getSize() const;
-    //void setSize(int size);
+
+    bool getMarkedToDelete() const;
+    void setMarkedToDelete(bool markedToDelete);
 
 private:
     QColor m_color;
-    //int m_size;
+    bool m_markedToDelete;
 };

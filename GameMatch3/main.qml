@@ -86,7 +86,6 @@ ApplicationWindow {
                 if(board.choosed === 2)
                 {
                     board.second = index
-                    game.move(board.first, board.second)
                     marked = true
                 }
 
@@ -94,14 +93,17 @@ ApplicationWindow {
             onRelease: {
 
                 if(board.choosed === 2) {
-
+                    board.itemAtIndex(board.first).marked = false;
                     board.isPressed = false
                     board.choosed = 0
                     marked = false
+
+                    if(!game.moveHandler(board.first, board.second)){
+                        board.itemAtIndex(board.first).animationStart();
+                        animationStart();
+                    }
                 }
-
             }
-
         }
     }
 }

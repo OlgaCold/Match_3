@@ -48,8 +48,8 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;*/
 public slots:
-    void clickHandler(int index);
-    void move(int clicked, int released);
+    //void clickHandler(int index);
+    bool moveHandler(int clicked, int released);
     void newGame();
 
 
@@ -58,9 +58,12 @@ private:
     int m_columns;
     QList<Bubble*> m_bubbles;
     QList<QColor> m_colors;
+    //QVector<int> m_toDelete;
 
     void setStartValues(const QString file);
     bool checkMove(int from, int to) const;
-    void connectedBlocks(int clicked, int released);
+    int connectedBlocks(int row, int col, QColor color);
+    void deleteBlocks();
+    void move(int clicked, int released);
 
 };

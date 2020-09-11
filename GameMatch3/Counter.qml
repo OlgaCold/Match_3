@@ -24,14 +24,16 @@ Rectangle {
 
             font.pixelSize: 26
             color: "#b8860b"
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment:  Qt.AlignHCenter
+            //anchors.horizontalCenter: parent.horizontalCenter//
         }
         Text {
             id: countLabel
             text: "34"
             font.pixelSize: 26
             color: "#b8860b"
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment:  Qt.AlignHCenter
+            //anchors.horizontalCenter: parent.horizontalCenter//
         }
     }
 
