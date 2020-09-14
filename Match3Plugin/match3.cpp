@@ -37,7 +37,7 @@ QVariant Match3::data(const QModelIndex &index, int role) const
     switch(role) {
     case ColorRole:
         return m_bubbles.at(row)->getColor();
-    /*case SizeRole:
+        /*case SizeRole:
         return m_bubbles.at(row)->getSize();*/
     }
     return QVariant();
@@ -102,6 +102,7 @@ void Match3::move(int clicked, int released)
     }
 
 }
+
 bool Match3::moveHandler(int clicked, int released)
 {
     //printf("clicked at %d, released at %d\n", clicked, released);
@@ -110,6 +111,7 @@ bool Match3::moveHandler(int clicked, int released)
     int col_1 = clicked % m_columns;
     int row_2 = floor(released / m_columns);
     int col_2 = released % m_columns;
+    QVector<int> toDelete;
 
     int clickedConnected = 0;
     int releasedConnected = 0;
@@ -120,32 +122,33 @@ bool Match3::moveHandler(int clicked, int released)
     //printf("%d\n",connectedBlocks(row_1, col_1, m_bubbles.at(clicked)->getColor()));
 
 
-    clickedConnected = connectedBlocks(row_1, col_1, m_bubbles.at(clicked)->getColor());
+    clickedConnected = connectedBlocks(row_1, col_1, m_bubbles.at(clicked)->getColor(), toDelete);
 
-    /*if (clickedConnected >= 3) {
+    if (clickedConnected >= 3) {
+        for(int i = 0; i < toDelete.count(); i++){
 
-        for(int i = 0; i < m_toDelete.count(); i++){
-
-            m_bubbles.at(m_toDelete.at(i))->setMarkedToDelete(true);
+            m_bubbles.at(toDelete.at(i))->setMarkedToDelete(true);
         }
-        m_toDelete.clear();
-    }*/
+    }
+    toDelete.clear();
 
-    releasedConnected = connectedBlocks(row_2, col_2, m_bubbles.at(released)->getColor());
-    /*if (releasedConnected >= 3) {
-        for(int i = 0; i < m_toDelete.count(); i++){
-            m_bubbles.at(m_toDelete.at(i))->setMarkedToDelete(true);
+    releasedConnected = connectedBlocks(row_2, col_2, m_bubbles.at(released)->getColor(), toDelete);
+    if (releasedConnected >= 3) {
+        for(int i = 0; i < toDelete.count(); i++){
+            m_bubbles.at(toDelete.at(i))->setMarkedToDelete(true);
         }
-        m_toDelete.clear();
-    }*/
+    }
+    toDelete.clear();
 
     if( clickedConnected >= 3 || releasedConnected >= 3 ) {
 
         deleteBlocks();
 
+
         for(int i = 0; i < m_bubbles.count(); i++){
             m_bubbles.at(i)->setMarkedToDelete(false);
         }
+        moveToBottom();
         return true;
 
     } else {
@@ -230,20 +233,20 @@ bool Match3::checkMove(int from, int to) const
     //printf("%d, %d  %d, %d\n", from_row, from_col, to_row, to_col);
 
     if( (abs(from_row - to_row) == 1 && abs(from_col - to_col) == 0) ||
-        (abs(from_col - to_col) == 1 && abs(from_row - to_row) == 0)){
+            (abs(from_col - to_col) == 1 && abs(from_row - to_row) == 0)){
         return true;
     } else { return false; }
 
 }
 
-int Match3::connectedBlocks(int row, int col, QColor color)
+int Match3::connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete)
 {
 
     if(row >= m_rows || col >= m_columns || row < 0 || col < 0)
     {
         return 0; }
 
-    if(m_bubbles.at(row * m_columns + col )->getMarkedToDelete() == true)//if(m_toDelete.contains(row * m_columns + col))
+    if(toDelete.contains(row * m_columns + col))
     {
         return 0; }
 
@@ -252,17 +255,17 @@ int Match3::connectedBlocks(int row, int col, QColor color)
         return 0; }
 
     int connected_blocks = 1;
-    //m_toDelete.append(row * m_columns + col);
+    toDelete.append(row * m_columns + col);
 
-    m_bubbles.at(row * m_columns + col)->setMarkedToDelete(true);
+    //m_bubbles.at(row * m_columns + col)->setMarkedToDelete(true);
     //printf("%d , %d ", row, col);
     //printf(m_bubbles.at(row * m_columns + col)->getMarkedToDelete() ? "true " : "false ");
 
 
-    connected_blocks += connectedBlocks(row + 1, col, color);
-    connected_blocks += connectedBlocks(row - 1, col, color);
-    connected_blocks += connectedBlocks(row, col + 1, color);
-    connected_blocks += connectedBlocks(row, col - 1, color);
+    connected_blocks += connectedBlocks(row + 1, col, color, toDelete);
+    connected_blocks += connectedBlocks(row - 1, col, color, toDelete);
+    connected_blocks += connectedBlocks(row, col + 1, color, toDelete);
+    connected_blocks += connectedBlocks(row, col - 1, color, toDelete);
 
     return connected_blocks;
 
@@ -272,14 +275,66 @@ void Match3::deleteBlocks()
 {
     for(int i = 0; i < m_rows; i++){
         for(int j = 0; j < m_columns; j++){
-            printf(m_bubbles.at(i * m_columns + j)->getMarkedToDelete() ? "true " : "false ");
+            if(m_bubbles.at(i * m_columns + j)->getMarkedToDelete()){
+                emit beginRemoveRows(QModelIndex(), i * m_columns + j, i * m_columns + j);
+                m_bubbles.removeAt(i * m_columns + j);
+                //printf(m_bubbles.at(i * m_columns + j)->getMarkedToDelete() ? "true " : "false ");
+                emit endRemoveRows();
+                emit beginInsertRows(QModelIndex(), i * m_columns + j, i * m_columns + j);
+                m_bubbles.insert(i * m_columns + j, new Bubble(nullptr, "transparent", false));
+                emit endInsertRows();
+            }
         }
-        printf("\n");
     }
-    printf("\n");
+
+    //emit beginRemoveRows(QModelIndex(), 3, 3);
+    //m_bubbles.removeAt(3);
+    //emit endRemoveRows();
+    //emit beginInsertRows(QModelIndex(), 3, 3);
+    //m_bubbles.insert(3, new Bubble(nullptr, m_colors.at(qrand() % m_colors.size()), false));
+    //emit endInsertRows();
+
+
 }
 
+void Match3::moveToBottom()
+{
 
+    for(int col = 0; col < m_columns; col++){
+        for(int row = m_rows - 1; row >= 0; row--){
+            if(m_bubbles.at(row * m_columns + col)->getColor() == "transparent") {
+
+                int tempInd = row * m_columns + col - m_columns;
+
+                while(tempInd >= 0 && m_bubbles.at(row * m_columns + col)->getColor() == "transparent"){
+                    if(m_bubbles.at(tempInd)->getColor() != "transparent"){
+                        move(row * m_columns + col, tempInd);
+                        tempInd -= m_columns;
+                    } else {
+                        tempInd -= m_columns;
+                    }
+                }
+            }
+        }
+    }
+    /*for(int ind = m_bubbles.count() - 1; ind >= 0; ind--) {
+        //printf("here");
+        if(m_bubbles.at(ind)->getColor() == "transparent") {
+            //printf("here1");
+            int tempInd = ind - m_columns;
+
+            while(tempInd >= 0){
+                //printf("here2");
+                if(m_bubbles.at(tempInd)->getColor() != "transparent"){
+                    move(ind, tempInd);
+                    tempInd -= m_columns;
+                } else {
+                    tempInd -= m_columns;
+                }
+            }
+        }
+    }*/
+}
 /*
 
 bool GameMatch3::insertRows(int row, int count, const QModelIndex &parent)

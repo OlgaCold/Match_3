@@ -62,8 +62,9 @@ private:
 
     void setStartValues(const QString file);
     bool checkMove(int from, int to) const;
-    int connectedBlocks(int row, int col, QColor color);
+    int connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete);
     void deleteBlocks();
     void move(int clicked, int released);
+    void moveToBottom();
 
 };
