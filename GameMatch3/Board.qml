@@ -32,11 +32,40 @@ Rectangle{
 
         currentIndex: -1
 
-        displaced: Transition {
-            NumberAnimation { properties: "x,y,"; easing.type: Easing.OutQuad }
-        }
         move: Transition {
-            NumberAnimation { properties: "x,y"; easing.type: Easing.OutQuad }
+
+            SequentialAnimation {
+
+                alwaysRunToEnd: true
+
+            NumberAnimation { properties: "x, y"; duration: 1000; easing.type: Easing.OutQuad }
+            NumberAnimation { property: "opacity"; to: 1; duration: 1000 }
+
+            }
+
         }
+
+        moveDisplaced:Transition {
+            SequentialAnimation {
+                alwaysRunToEnd: true
+            NumberAnimation { properties: "x, y"; duration: 1000; easing.type: Easing.OutQuad }
+            NumberAnimation { property: "opacity"; to: 1; duration: 1000 }
+
+            }}
+
+        remove: Transition {
+            SequentialAnimation {
+            NumberAnimation { property: "opacity"; to: 0; duration: 200 }
+
+            }
+        }
+
+        add: Transition {
+            ParallelAnimation {
+            NumberAnimation { property: "opacity"; to: 1; duration: 1000 }
+            NumberAnimation { properties: "y"; duration: 1000; easing.type: Easing.OutQuad }
+            }
+        }
+
     }
 }

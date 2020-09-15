@@ -61,6 +61,8 @@ ApplicationWindow {
         width: game.col * cellWidth
         height: game.row * cellHeight
 
+
+
         model: Match3 { id: game}
         delegate: BubbleDelegate {
 
@@ -102,6 +104,8 @@ ApplicationWindow {
                         board.itemAtIndex(board.first).animationStart();
                         animationStart();
                     }
+
+
                 }
             }
         }
