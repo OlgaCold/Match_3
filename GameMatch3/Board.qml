@@ -1,4 +1,4 @@
-import QtQuick 2.9
+import QtQuick 2.12
 
 Rectangle{
 
@@ -13,8 +13,7 @@ Rectangle{
     property int choosed: 0
     property bool isPressed: false
 
-    signal clicked
-    signal released
+    signal finished
 
     function itemAtIndex(index) {
         return grid.itemAtIndex(index);
@@ -33,39 +32,28 @@ Rectangle{
         currentIndex: -1
 
         move: Transition {
-
-            SequentialAnimation {
-
-                alwaysRunToEnd: true
-
-            NumberAnimation { properties: "x, y"; duration: 1000; easing.type: Easing.OutQuad }
-            NumberAnimation { property: "opacity"; to: 1; duration: 1000 }
-
-            }
-
+            NumberAnimation { properties: "x, y"; duration: 500; easing.type: Easing.OutQuad }
         }
 
         moveDisplaced:Transition {
             SequentialAnimation {
-                alwaysRunToEnd: true
-            NumberAnimation { properties: "x, y"; duration: 1000; easing.type: Easing.OutQuad }
-            NumberAnimation { property: "opacity"; to: 1; duration: 1000 }
-
-            }}
+                NumberAnimation { properties: "x, y"; duration: 1000; easing.type: Easing.OutQuad }//1000
+            }
+        }
 
         remove: Transition {
             SequentialAnimation {
-            NumberAnimation { property: "opacity"; to: 0; duration: 200 }
-
+                NumberAnimation { property: "opacity"; to: 0; duration: 200 }
             }
         }
 
         add: Transition {
-            ParallelAnimation {
-            NumberAnimation { property: "opacity"; to: 1; duration: 1000 }
-            NumberAnimation { properties: "y"; duration: 1000; easing.type: Easing.OutQuad }
+            SequentialAnimation {
+                id: addAnimation
+                onFinished: { root.finished() }
+                NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 500 }
+                NumberAnimation { properties: "y"; duration: 500; easing.type: Easing.OutQuad }
             }
         }
-
     }
 }

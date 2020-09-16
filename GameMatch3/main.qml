@@ -2,6 +2,7 @@ import QtQuick 2.9
 import QtQuick.Window 2.3
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
+import QtQuick.Dialogs 1.2
 
 import Match3 1.0
 
@@ -32,17 +33,17 @@ ApplicationWindow {
 
         Counter{
             text: "move"
-            countText: "35"
+            countText: game.steps
             textColor: "#8b4513"
         }
         NewGameButton{
             text: "New game"
             textColor: "#8b4513"
-            onClicked: game.newGame()
+            onClicked: if(!game.newGame()) { messageDialog.open() }
         }
         Counter{
             text: "score"
-            countText: "156"
+            countText: game.score
             textColor: "#8b4513"
         }
     }
@@ -61,9 +62,8 @@ ApplicationWindow {
         width: game.col * cellWidth
         height: game.row * cellHeight
 
-
-
         model: Match3 { id: game}
+
         delegate: BubbleDelegate {
 
             id: bubleDelegate
@@ -90,8 +90,8 @@ ApplicationWindow {
                     board.second = index
                     marked = true
                 }
-
             }
+
             onRelease: {
 
                 if(board.choosed === 2) {
@@ -104,10 +104,33 @@ ApplicationWindow {
                         board.itemAtIndex(board.first).animationStart();
                         animationStart();
                     }
-
+                    if(!game.checkAvailableSteps()) {
+                        messageDialog.open()
+                    }
 
                 }
             }
         }
     }
+
+    MessageDialog {
+
+        id: messageDialog
+        text: "No valid moves =("
+
+        onAccepted: {
+            messageDialog.close()
+        }
+    }
+
+    /*MessageDialog {
+
+        id: message
+        text: " AnimationEnded! "
+
+        onAccepted: {
+            message.close()
+        }
+    }*/
+
 }
