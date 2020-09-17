@@ -3,8 +3,10 @@
 Match3::Match3(int steps, int score, QObject *parent)
     : QAbstractListModel(parent), m_steps(steps), m_score(score)
 {
-
-    readStartValues("start_values.json");
+    if(!configFromJson("config.json")){
+        createStandartJson("config.json");
+        configFromJson("config.json");
+    }
 
     for(int i = 0; i < m_rows * m_columns; i++) {
         m_bubbles.append(new Bubble(nullptr, m_colors.at(qrand() % m_colors.size()), false));
@@ -16,7 +18,6 @@ Match3::Match3(int steps, int score, QObject *parent)
         moveToBottom();
         addNewBubbles();
     }
-    printf("Constructor deleted matches\n");
     emit endResetModel();
 }
 Match3::~Match3()
@@ -85,7 +86,6 @@ bool Match3::moveHandler(int clicked, int released)
         for(int i = 0; i < toDelete.count(); i++){
             m_bubbles.at(toDelete.at(i))->setMarkedToDelete(true);
         }
-        //m_score += clickedConnected;
     }
     toDelete.clear();
 
@@ -94,37 +94,16 @@ bool Match3::moveHandler(int clicked, int released)
         for(int i = 0; i < toDelete.count(); i++){
             m_bubbles.at(toDelete.at(i))->setMarkedToDelete(true);
         }
-        //m_score += releasedConnected;
     }
     toDelete.clear();
 
     if( clickedConnected >= 3 || releasedConnected >= 3 ) {
 
-        //deleteBlocks();
-        //clearBubbleMarks();
-
         m_steps++;
         emit stepsChanged(m_steps);
-        //emit scoreChanged(m_score);
-
-
-        //moveToBottom();
-        //addNewBubbles();
-        //clearBubbleMarks();
-
-        /*while(checkMatches()){
-            deleteBlocks();
-            clearBubbleMarks();
-            moveToBottom();
-            addNewBubbles();
-            //m_steps++;
-            //emit stepsChanged(m_steps);
-        }*/
-        //m_steps = 0;
         return true;
 
     } else {
-
         move(clicked, released);
         clearBubbleMarks();
         return false;
@@ -141,7 +120,7 @@ bool Match3::checkAvailableSteps()
 
             QList<Bubble*> boardCopy;
             for(int i = 0; i < m_bubbles.count(); i++){
-                boardCopy.append(new Bubble(nullptr, m_bubbles.at(i)->getColor(), false));//
+                boardCopy.append(new Bubble(nullptr, m_bubbles.at(i)->getColor(), false));
             }
             QVector<int> toDelete;
 
@@ -156,14 +135,11 @@ bool Match3::checkAvailableSteps()
                 boardCopy.move(max - 1, min);
             }
 
-            //printf("current - %d, swap - %d\n", curIndex, swapIndex);
-
             int clickedConnected = connectedBlocks(i, j, boardCopy.at(curIndex)->getColor(), toDelete, boardCopy);
 
             toDelete.clear();
             int releasedConnected = connectedBlocks(i + 1, j, boardCopy.at(swapIndex)->getColor(), toDelete, boardCopy);
             toDelete.clear();
-            //printf("1 connect - %d, 2 connect - %d\n", clickedConnected, releasedConnected);
 
             for (int i = 0; i < boardCopy.size(); i++){
                 delete boardCopy.takeAt(i);
@@ -227,11 +203,10 @@ bool Match3::newGame()
         m_bubbles.at(i)->setColor(m_colors.at(qrand() % m_colors.size()));
     }
     while(checkMatches()){
-        deleteBlocks();//
+        deleteBlocks();
         moveToBottom();
         addNewBubbles();
     }
-    //printf("New game deleted matches\n");
     emit endResetModel();
 
     m_steps = 0;
@@ -244,49 +219,68 @@ bool Match3::newGame()
     }
     return true;
 }
-void Match3::readStartValues(const QString file)
+bool Match3::configFromJson(const QString path)
 {
-    QFile file_obj(file);
-    if(!file_obj.open(QIODevice::ReadOnly)){
-        qDebug()<<"Failed to open "<<file;
-        exit(1);
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly)){
+        qDebug()<< "Failed to open JSON. Created new JSON file." << path;
+        return false;
     }
 
-    QTextStream file_text(&file_obj);
-    QString json_string;
-    json_string = file_text.readAll();
-    file_obj.close();
-    QByteArray json_bytes = json_string.toLocal8Bit();
+    QString jsonString = file.readAll();
+    file.close();
+    QByteArray json_bytes = jsonString.toLocal8Bit();
 
-    auto json_doc = QJsonDocument::fromJson(json_bytes);
+    auto jsonDoc = QJsonDocument::fromJson(json_bytes);
 
-    if(json_doc.isNull()){
-        qDebug()<<"Failed to create JSON doc.";
-        exit(2);
+    if(jsonDoc.isNull()){
+        qDebug()<<"Failed to create QJsonDocument. Created new JSON file.";
+        return false;
     }
-    if(!json_doc.isObject()){
-        qDebug()<<"JSON is not an object.";
-        exit(3);
+    if(!jsonDoc.isObject()){
+        qDebug()<<"JSON is not an object. Created standart.";
+        return false;
     }
 
-    QJsonObject json_obj = json_doc.object();
+    QJsonObject jsonObj = jsonDoc.object();
 
-    if(json_obj.isEmpty()){
-        qDebug()<<"JSON object is empty.";
-        exit(4);
+    if(jsonObj.isEmpty()){
+        qDebug()<<"JSON object is empty. Created standart.";
+        return false;
     }
 
-    QVariantMap json_map = json_obj.toVariantMap();
-
-    m_rows = json_map["rows"].toInt();
-    m_columns = json_map["columns"].toInt();
-
-    QJsonArray jsonArray = json_obj["colors"].toArray();
+    m_rows = jsonObj.value("rows").toInt();
+    m_columns = jsonObj.value("columns").toInt();
+    QJsonArray jsonArray = jsonObj.value("colors").toArray();
 
     for(int i = 0; i < jsonArray.size(); i++) {
         m_colors.append(jsonArray.at(i).toString());
     }
+    return true;
+}
+void Match3::createStandartJson(const QString path)
+{
+    QJsonObject jsonObj;
+    QJsonArray jsonArray = {"black", "green", "blue", "white", "red", "orange", "violet"};
+    jsonObj["columns"] = 4;
+    jsonObj["rows"] = 4;
+    jsonObj["colors"] = jsonArray;
 
+    QJsonDocument jsonDoc(jsonObj);
+    QString jsonString = jsonDoc.toJson();
+
+    if(QFile::exists(path)){
+        QFile::remove(path);
+    }
+
+    QFile file(path);
+    if(!file.open(QIODevice::ReadWrite)){
+        qDebug() << "Failed to open save file.";
+        exit(1);
+    }
+
+    file.write(jsonString.toLocal8Bit());
+    file.close();
 }
 bool Match3::checkMove(int from, int to) const
 {
@@ -376,7 +370,6 @@ void Match3::moveToBottom()
         for(int row = m_rows - 1; row >= 0; row--){
             if(m_bubbles.at(row * m_columns + col)->getColor() == "transparent") {
 
-
                 int ind = row * m_columns + col;
                 int tempInd = row * m_columns + col - m_columns;
                 while(tempInd >= 0){
@@ -423,7 +416,6 @@ void Match3::addNewBubbles()
 }
 bool Match3::checkMatches()
 {
-
     bool matchExist = false;
 
     for(int i = 0; i < m_bubbles.count(); i++){
@@ -433,24 +425,14 @@ bool Match3::checkMatches()
             int temp_row = row(i);
             int temp_col = col(i);
 
-            //printf(onDelete.isEmpty() ? "empty\n" : "something here\n");
-
             int connected = connectedBlocks(temp_row, temp_col, color, onDelete);
-            if(onDelete.count() >= 3){
-                for(int i = 0; i < onDelete.count(); i++){
-                    printf("%d ", onDelete.at(i));
-                }
-            }
 
-            //printf("\n");
             if(connected >= 3){
                 matchExist = true;
                 for(int i = 0; i < onDelete.count(); i++){
                     m_bubbles.at(onDelete.at(i))->setMarkedToDelete(true);
-                    //printf("%d ", onDelete.at(i));
                 }
                 onDelete.clear();
-                printf(" - deleted until match exist\n");
             }
         }
     }

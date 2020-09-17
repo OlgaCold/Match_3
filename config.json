@@ -1,13 +1,13 @@
-{   "rows": 5,
-    "columns": 6,
+{
     "colors": [
         "black",
         "green",
         "blue",
         "white",
-        "pink",
         "red",
         "orange",
         "violet"
-    ]
+    ],
+    "columns": 5,
+    "rows": 5
 }

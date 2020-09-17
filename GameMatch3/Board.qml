@@ -15,7 +15,6 @@ Rectangle{
 
     signal addFinished
     signal moveFinished
-    //signal removeFinished
 
     function itemAtIndex(index) {
         return grid.itemAtIndex(index);
@@ -41,7 +40,7 @@ Rectangle{
                     root.moveFinished()
                 }
             }
-            NumberAnimation { properties: "x, y"; duration: 1000; easing.type: Easing.OutQuad }
+            NumberAnimation { properties: "x, y"; duration: 500; easing.type: Easing.OutQuad }
         }
 
         moveDisplaced:Transition {
@@ -51,17 +50,12 @@ Rectangle{
                     root.moveFinished()
                 }
             }
-            NumberAnimation { properties: "x, y"; duration: 1000; easing.type: Easing.OutQuad }
+            NumberAnimation { properties: "x, y"; duration: 500; easing.type: Easing.OutQuad }
         }
 
         remove:Transition {
             id: removeAnimation
-            /*onRunningChanged: {
-                if (!removeAnimation.running) {
-                    root.removeFinished()
-                }
-            }*/
-            NumberAnimation { property: "opacity"; to: 0; duration: 1000 }
+            NumberAnimation { property: "opacity"; to: 0; duration: 200 }
         }
 
         add: Transition {
@@ -71,7 +65,7 @@ Rectangle{
                     root.addFinished()
                 }
             }
-            NumberAnimation { properties: "y"; from: -100; duration: 1000; easing.type: Easing.OutQuad }
+            NumberAnimation { properties: "y"; from: -100; duration: 500; easing.type: Easing.OutQuad }
         }
     }
 }

@@ -20,10 +20,7 @@ if [ ! -d $BUILD_DIR ]; then
   mkdir build
 fi
 
-cd Match3Plugin
-cp start_values.json ../
-
-cd ../build
+cd build
 
 echo "Building plugin ..."
 $QMAKE_EXEC ../Match3Plugin 2>&1 >/dev/null

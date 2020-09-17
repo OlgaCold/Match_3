@@ -41,5 +41,4 @@ cpqmldir.files = qmldir
 cpqmldir.path = $$DESTDIR
 COPIES += cpqmldir
 
-DISTFILES += \
-    start_values.json
+DISTFILES +=

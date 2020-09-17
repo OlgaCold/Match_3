@@ -6,6 +6,4 @@ Rectangle {
 
     radius: height/2
     border.color: Qt.darker(color)
-
-
 }

@@ -57,12 +57,12 @@ private:
     QList<QColor> m_colors;
 
 
-    void readStartValues(const QString file);
-    bool checkMove(int from, int to) const;
-    int connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete);
-    int connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete, QList<Bubble*> &board);
+    bool configFromJson(const QString path);
+    void createStandartJson(const QString path);
+    bool checkMove(int from, int to) const; // return true, if gamer move is valid
+    int connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete); // return number of connected blocks and fill vectop toDelete
+    int connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete, QList<Bubble*> &board); //for copy of the Board
     void move(int clicked, int released);  
-
     int row(int index) const;
     int col(int index) const;
 };

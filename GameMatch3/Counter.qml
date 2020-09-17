@@ -25,7 +25,6 @@ Rectangle {
             font.pixelSize: 26
             color: "#b8860b"
             Layout.alignment:  Qt.AlignHCenter
-            //anchors.horizontalCenter: parent.horizontalCenter//
         }
         Text {
             id: countLabel
@@ -33,7 +32,6 @@ Rectangle {
             font.pixelSize: 26
             color: "#b8860b"
             Layout.alignment:  Qt.AlignHCenter
-            //anchors.horizontalCenter: parent.horizontalCenter//
         }
     }
 

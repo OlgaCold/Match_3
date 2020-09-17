@@ -105,9 +105,6 @@ ApplicationWindow {
                         board.itemAtIndex(board.first).animationStart();
                         animationStart();
                     }
-                    /*if(!game.checkAvailableSteps()) {
-                        messageDialog.open()
-                    }*/
                 }
             }
         }
@@ -124,12 +121,6 @@ ApplicationWindow {
             }
         }
 
-        /*onRemoveFinished: {
-            //game.moveToBottom();
-            //game.addNewBubbles();
-            message.open()
-        }*/
-
         onMoveFinished: {
 
             game.deleteBlocks();
@@ -140,29 +131,12 @@ ApplicationWindow {
         }
     }
 
-    Connections {
-        target: board
-        function onClicked() { onMoveFinished() }
-    }
-
     MessageDialog {
 
         id: messageDialog
         text: "No valid moves =("
-
         onAccepted: {
             messageDialog.close()
         }
     }
-
-    MessageDialog {
-
-        id: message
-        text: " AnimationEnded! "
-
-        onAccepted: {
-            message.close()
-        }
-    }
-
 }
