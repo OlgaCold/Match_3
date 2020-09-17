@@ -21,7 +21,6 @@ class Match3 : public QAbstractListModel
     Q_PROPERTY(qint32 steps MEMBER m_steps NOTIFY stepsChanged)
     Q_PROPERTY(qint32 score MEMBER m_score NOTIFY scoreChanged)
 
-
 public:
     explicit Match3(int steps = 0, int score = 0, QObject *parent = nullptr);
     ~Match3() override;
@@ -31,7 +30,6 @@ public:
     };
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
 
@@ -42,8 +40,13 @@ signals:
 public slots:
     bool newGame(); //return false if no move available
     bool moveHandler(int clicked, int released);
-    bool checkAvailableSteps();
+    bool checkAvailableSteps(); //brute force algorithm, return true if step available
 
+    bool checkMatches(); //return true if match exist and mark bubbles to delete
+    void deleteBlocks(); //remove and insert transparent blocks by marks
+    void moveToBottom(); //move transparent up
+    void addNewBubbles(); //delete transparent and insert random color bubble
+    void clearBubbleMarks(); // set all Bubble m_markedToDelete to false
 
 private:
     int m_rows;
@@ -54,16 +57,12 @@ private:
     QList<QColor> m_colors;
 
 
-    void setStartValues(const QString file);
-
+    void readStartValues(const QString file);
     bool checkMove(int from, int to) const;
     int connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete);
     int connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete, QList<Bubble*> &board);
+    void move(int clicked, int released);  
 
-    void deleteBlocks();
-    void move(int clicked, int released);
-    void moveToBottom();
-    void addNewBubbles();
-    bool checkMatches(); //return true if match exist and mark bubbles to delete
-
+    int row(int index) const;
+    int col(int index) const;
 };

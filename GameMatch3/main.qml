@@ -1,4 +1,4 @@
-import QtQuick 2.9
+import QtQuick 2.12
 import QtQuick.Window 2.3
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
@@ -74,6 +74,7 @@ ApplicationWindow {
             bubbleHeight: bubbleWidth
 
             state: board.isPressed && marked? "small" : "normal"
+
             onClick: {
 
                 board.choosed = board.choosed + 1
@@ -104,13 +105,44 @@ ApplicationWindow {
                         board.itemAtIndex(board.first).animationStart();
                         animationStart();
                     }
-                    if(!game.checkAvailableSteps()) {
+                    /*if(!game.checkAvailableSteps()) {
                         messageDialog.open()
-                    }
-
+                    }*/
                 }
             }
         }
+
+        onAddFinished: { //show messageDialog only once if no move available
+            if(!game.checkAvailableSteps()) {
+                messageDialog.open()
+            }
+            if(game.checkMatches()){
+                game.deleteBlocks();
+                game.clearBubbleMarks();
+                game.moveToBottom();
+                game.addNewBubbles();
+            }
+        }
+
+        /*onRemoveFinished: {
+            //game.moveToBottom();
+            //game.addNewBubbles();
+            message.open()
+        }*/
+
+        onMoveFinished: {
+
+            game.deleteBlocks();
+            game.clearBubbleMarks();
+            game.moveToBottom();
+            game.addNewBubbles();
+
+        }
+    }
+
+    Connections {
+        target: board
+        function onClicked() { onMoveFinished() }
     }
 
     MessageDialog {
@@ -123,7 +155,7 @@ ApplicationWindow {
         }
     }
 
-    /*MessageDialog {
+    MessageDialog {
 
         id: message
         text: " AnimationEnded! "
@@ -131,6 +163,6 @@ ApplicationWindow {
         onAccepted: {
             message.close()
         }
-    }*/
+    }
 
 }

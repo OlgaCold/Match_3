@@ -13,7 +13,9 @@ Rectangle{
     property int choosed: 0
     property bool isPressed: false
 
-    signal finished
+    signal addFinished
+    signal moveFinished
+    //signal removeFinished
 
     function itemAtIndex(index) {
         return grid.itemAtIndex(index);
@@ -30,30 +32,46 @@ Rectangle{
         interactive: false
 
         currentIndex: -1
+        clip: true
 
         move: Transition {
-            NumberAnimation { properties: "x, y"; duration: 500; easing.type: Easing.OutQuad }
+            id: moveAnimation
+            onRunningChanged: {
+                if (!moveAnimation.running) {
+                    root.moveFinished()
+                }
+            }
+            NumberAnimation { properties: "x, y"; duration: 1000; easing.type: Easing.OutQuad }
         }
 
         moveDisplaced:Transition {
-            SequentialAnimation {
-                NumberAnimation { properties: "x, y"; duration: 1000; easing.type: Easing.OutQuad }//1000
+            id: moveDisplacedAnimation
+            onRunningChanged: {
+                if (!moveDisplacedAnimation.running) {
+                    root.moveFinished()
+                }
             }
+            NumberAnimation { properties: "x, y"; duration: 1000; easing.type: Easing.OutQuad }
         }
 
-        remove: Transition {
-            SequentialAnimation {
-                NumberAnimation { property: "opacity"; to: 0; duration: 200 }
-            }
+        remove:Transition {
+            id: removeAnimation
+            /*onRunningChanged: {
+                if (!removeAnimation.running) {
+                    root.removeFinished()
+                }
+            }*/
+            NumberAnimation { property: "opacity"; to: 0; duration: 1000 }
         }
 
         add: Transition {
-            SequentialAnimation {
-                id: addAnimation
-                onFinished: { root.finished() }
-                NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 500 }
-                NumberAnimation { properties: "y"; duration: 500; easing.type: Easing.OutQuad }
+            id: addAnimation
+            onRunningChanged: {
+                if (!addAnimation.running) {
+                    root.addFinished()
+                }
             }
+            NumberAnimation { properties: "y"; from: -100; duration: 1000; easing.type: Easing.OutQuad }
         }
     }
 }

@@ -1,5 +1,5 @@
 {   "rows": 5,
-    "columns": 5,
+    "columns": 6,
     "colors": [
         "black",
         "green",
@@ -7,6 +7,7 @@
         "white",
         "pink",
         "red",
-        "orange"
+        "orange",
+        "violet"
     ]
 }
