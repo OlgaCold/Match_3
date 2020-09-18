@@ -1,5 +1,5 @@
 import QtQuick 2.12
-import QtQuick.Window 2.3
+import QtQuick.Window 2.12
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 import QtQuick.Dialogs 1.2
@@ -12,15 +12,21 @@ ApplicationWindow {
 
     property int itemSize: 100
     property int marginSize: 10
+    property int score: 0
+    property int moves: 0
 
     title: qsTr("Match 3")
     visible: true
+    //width: game.col * (itemSize + marginSize) + 20
+    //height: game.col * (itemSize + marginSize) + 100
     width: game.col < 3 ? 3 * (itemSize + marginSize) + 20 : game.col * (itemSize + marginSize) + 20
     height: game.row * (itemSize + marginSize) + 100
     color: "#faebd7"
 
     minimumWidth: game.col < 3 ? 3 * (itemSize + marginSize) + 20 : game.col * (itemSize + marginSize) + 20
     minimumHeight: game.row * (itemSize + marginSize) + 100
+    //maximumHeight: Screen.height - 200
+    //maximumWidth: Screen.width - 200
 
     RowLayout{
 
@@ -33,17 +39,21 @@ ApplicationWindow {
 
         Counter{
             text: "move"
-            countText: game.steps
+            countText: moves//game.steps
             textColor: "#8b4513"
         }
         NewGameButton{
             text: "New game"
             textColor: "#8b4513"
-            onClicked: if(!game.newGame()) { messageDialog.open() }
+            onClicked: {
+                root.score = 0
+                root.moves = 0
+                if(!game.newGame()) { messageDialog.open() }
+            }
         }
         Counter{
             text: "score"
-            countText: game.score
+            countText: score//game.score
             textColor: "#8b4513"
         }
     }
@@ -59,8 +69,13 @@ ApplicationWindow {
 
         cellWidth: itemSize + marginSize
         cellHeight: cellWidth
+
         width: game.col * cellWidth
         height: game.row * cellHeight
+        //gridWidth: game.col * cellWidth
+        //gridHeight: game.row * cellHeight
+        //contentWidth: game.col * cellWidth
+        //contentHeight: game.row * cellHeight
 
         model: Match3 { id: game}
 
@@ -104,6 +119,8 @@ ApplicationWindow {
                     if(!game.moveHandler(board.first, board.second)){
                         board.itemAtIndex(board.first).animationStart();
                         animationStart();
+                    } else {
+                        root.moves++
                     }
                 }
             }
@@ -114,7 +131,7 @@ ApplicationWindow {
                 messageDialog.open()
             }
             if(game.checkMatches()){
-                game.deleteBlocks();
+                root.score += game.deleteBlocks();
                 game.clearBubbleMarks();
                 game.moveToBottom();
                 game.addNewBubbles();
@@ -123,7 +140,7 @@ ApplicationWindow {
 
         onMoveFinished: {
 
-            game.deleteBlocks();
+            root.score += game.deleteBlocks();
             game.clearBubbleMarks();
             game.moveToBottom();
             game.addNewBubbles();
