@@ -43,9 +43,11 @@ ApplicationWindow {
             textColor: "#8b4513"
             onClicked: {
 
-                root.score = 0
-                root.moves = 0
-                if(!game.newGame()) { messageDialog.open() }
+                if(!board.animationRunning()){
+                    root.score = 0
+                    root.moves = 0
+                    if(!game.newGame()) { messageDialog.open() }
+                }
             }
         }
         Counter{
@@ -144,6 +146,7 @@ ApplicationWindow {
             }
 
             onAddFinished: { //show messageDialog only once if no move available
+
                 if(!game.checkAvailableSteps()) {
                     messageDialog.open()
                 }

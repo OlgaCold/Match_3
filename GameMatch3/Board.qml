@@ -21,6 +21,14 @@ Rectangle{
         return grid.itemAtIndex(index);
     }
 
+    function animationRunning() {
+        if(addAnimation.running || moveAnimation.running || moveDisplacedAnimation.running){
+            return true
+        } else {
+            return false
+        }
+    }
+
     color: "transparent"
     border.color: "#8b4513"
     border.width: 2
@@ -42,7 +50,7 @@ Rectangle{
                     root.moveFinished()
                 }
             }
-            NumberAnimation { properties: "x, y"; duration: 500; alwaysRunToEnd: true; easing.type: Easing.OutQuad }
+            NumberAnimation { properties: "x, y"; duration: 500; easing.type: Easing.OutQuad }
         }
 
         moveDisplaced:Transition {
@@ -52,12 +60,12 @@ Rectangle{
                     root.moveFinished()
                 }
             }
-            NumberAnimation { properties: "x, y"; duration: 500; alwaysRunToEnd: true; easing.type: Easing.OutQuad }
+            NumberAnimation { properties: "x, y"; duration: 500; easing.type: Easing.OutQuad }
         }
 
         remove:Transition {
             id: removeAnimation
-            NumberAnimation { property: "opacity"; to: 0; alwaysRunToEnd: true; duration: 200 }
+            NumberAnimation { property: "opacity"; to: 0; duration: 200 }
         }
 
         add: Transition {
@@ -67,8 +75,7 @@ Rectangle{
                     root.addFinished()
                 }
             }
-
-            NumberAnimation { properties: "y"; from: -100; duration: 500; alwaysRunToEnd: true; easing.type: Easing.OutQuad }
+            NumberAnimation { properties: "y"; from: -100; duration: 500; easing.type: Easing.OutQuad }
         }
     }
 }
