@@ -17,8 +17,8 @@ ApplicationWindow {
 
     title: qsTr("Match 3")
     visible: true
-    width: game.col * (itemSize + marginSize) + 20
-    height: game.row * (itemSize + marginSize) + 100
+    width:  game.col > 13 ? 13 * (itemSize + marginSize) + 20 : game.col * (itemSize + marginSize) + 20
+    height: game.row > 8 ? 8 * (itemSize + marginSize) + 100 : game.row * (itemSize + marginSize) + 100
     color: "#faebd7"
 
     minimumWidth: 3 * (itemSize + marginSize) + 20
@@ -62,8 +62,8 @@ ApplicationWindow {
 
         id: flickable
 
-        width: root.width > Screen.width - 200 ? Screen.width - 220 : root.width - 20
-        height: root.height > Screen.height - 200 ? Screen.height - 300 : root.height - 100
+        width: parent.width - 20
+        height: parent.height - 100
 
         clip: true
         interactive: false
@@ -88,7 +88,8 @@ ApplicationWindow {
 
             id: board
 
-            anchors.centerIn: parent
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
 
             cellWidth: itemSize + marginSize
             cellHeight: cellWidth
