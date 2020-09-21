@@ -9,8 +9,6 @@ Rectangle{
     property alias delegate: grid.delegate
     property alias cellWidth: grid.cellWidth
     property alias cellHeight: grid.cellHeight
-    property alias contentWidth: grid.contentWidth
-    property alias contentHeight: grid.contentHeight
     property int first
     property int second
     property int choosed: 0
@@ -36,14 +34,6 @@ Rectangle{
 
         currentIndex: -1
         clip: true
-
-        //ScrollBar.horizontal: ScrollBar { id: hbar; active: vbar.active }
-        //ScrollBar.vertical: ScrollBar { id: vbar; active: hbar.active }
-
-        //focus: true
-        //Keys.onUpPressed: ScrollBar.decrease()//vbar.decrease()//
-        //Keys.onDownPressed: ScrollBar.increase()//vbar.increase()//
-
 
         move: Transition {
             id: moveAnimation

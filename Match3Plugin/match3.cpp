@@ -235,8 +235,8 @@ void Match3::createStandartJson(const QString path)
 {
     QJsonObject jsonObj;
     QJsonArray jsonArray = {"black", "green", "blue", "white", "red", "orange", "violet"};
-    jsonObj["columns"] = 4;
-    jsonObj["rows"] = 4;
+    jsonObj["columns"] = 5;
+    jsonObj["rows"] = 5;
     jsonObj["colors"] = jsonArray;
 
     QJsonDocument jsonDoc(jsonObj);
@@ -323,38 +323,6 @@ int Match3::connectedBlocks(int row, int col, QColor color, QVector<int> &toDele
     return connected_blocks;
 }
 
-int Match3::connected(int row, int col, QColor color, QVector<int> &toDelete)
-{
-    if(row >= m_rows || col >= m_columns || row < 0 || col < 0)
-    {
-        return 0; }
-
-    if(toDelete.contains(row * m_columns + col))
-    {
-        return 0; }
-
-    if(m_bubbles.at(row * m_columns + col)->getColor() != color)
-    {
-        return 0; }
-
-    int connected_blocks = 1;
-    toDelete.append(row * m_columns + col);
-
-    if(m_bubbles.at(getIndex(row + 1, col)) != nullptr){
-        connected_blocks += connectedBlocks(row + 1, col, color, toDelete);
-    }
-    if(m_bubbles.at(getIndex(row - 1, col)) != nullptr){
-        connected_blocks += connectedBlocks(row - 1, col, color, toDelete);
-    }
-    if(m_bubbles.at(getIndex(row, col + 1)) != nullptr){
-        connected_blocks += connectedBlocks(row, col + 1, color, toDelete);
-    }
-    if(m_bubbles.at(getIndex(row, col - 1)) != nullptr){
-        connected_blocks += connectedBlocks(row, col - 1, color, toDelete);
-    }
-    return connected_blocks;
-}
-
 void Match3::fillField()
 {
     emit beginResetModel();
@@ -385,7 +353,7 @@ QList<Bubble *> Match3::copyBoard()
 {
     QList<Bubble*> boardCopy;
     for(int i = 0; i < m_bubbles.count(); i++){
-        boardCopy.append(new Bubble(nullptr, m_bubbles.at(i)->getColor(), false));//
+        boardCopy.append(new Bubble(nullptr, m_bubbles.at(i)->getColor(), false));
     }
     return boardCopy;
 }

@@ -33,7 +33,7 @@ public:
 
 public slots:
     bool newGame(); //return false if no move available
-    bool moveHandler(int clicked, int released);
+    bool moveHandler(int clicked, int released); //return true if connected > 2
     bool checkAvailableSteps(); //brute force algorithm, return true if step available
 
     bool checkMatches(); //return true if match exist and mark bubbles to delete
@@ -53,7 +53,6 @@ private:
     bool checkMove(int from, int to) const; // return true, if gamer move is valid
     int connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete); // return number of connected blocks and fill vectop toDelete
     int connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete, QList<Bubble*> &board); //for copy of the Board
-    int connected(int row, int col, QColor color, QVector<int> &toDelete);
     void fillField();
     QList<Bubble*> copyBoard();
     void deleteBoardCopy(QList<Bubble*> &board);
