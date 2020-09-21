@@ -46,6 +46,7 @@ ApplicationWindow {
                 if(!board.animationRunning()){
                     root.score = 0
                     root.moves = 0
+                    board.choosed = 0
                     if(!game.newGame()) { messageDialog.open() }
                 }
             }
@@ -130,17 +131,22 @@ ApplicationWindow {
 
                 onRelease: {
 
-                    if(board.choosed === 2) {
-                        board.itemAtIndex(board.first).marked = false;
-                        board.isPressed = false
+                    if(board.itemAtIndex(board.first) === null){
                         board.choosed = 0
-                        marked = false
+                        board.first = -1
+                    } else {
+                        if(board.choosed === 2) {
+                            board.itemAtIndex(board.first).marked = false;
+                            board.isPressed = false
+                            board.choosed = 0
+                            marked = false
 
-                        if(!game.moveHandler(board.first, board.second)){
-                            board.itemAtIndex(board.first).animationStart();
-                            animationStart();
-                        } else {
-                            root.moves++
+                            if(!game.moveHandler(board.first, board.second)){
+                                board.itemAtIndex(board.first).animationStart();
+                                animationStart();
+                            } else {
+                                root.moves++
+                            }
                         }
                     }
                 }

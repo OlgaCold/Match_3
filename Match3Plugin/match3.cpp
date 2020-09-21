@@ -9,6 +9,9 @@ Match3::Match3(QObject *parent)
     }
 
     fillField();
+    while(!checkAvailableSteps()){
+        fillField();
+    }
 }
 
 Match3::~Match3()
