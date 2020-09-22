@@ -22,11 +22,7 @@ Rectangle{
     }
 
     function animationRunning() {
-        if(addAnimation.running || moveAnimation.running || moveDisplacedAnimation.running){
-            return true
-        } else {
-            return false
-        }
+        return addAnimation.running || moveAnimation.running || moveDisplacedAnimation.running
     }
 
     color: "transparent"
