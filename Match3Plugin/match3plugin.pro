@@ -11,12 +11,10 @@ uri = Match3
 
 SOURCES += \
     match3plugin_plugin.cpp \
-    bubble.cpp \
     match3.cpp
 
 HEADERS += \
     match3plugin_plugin.h \
-    bubble.h \
     match3.h
 
 

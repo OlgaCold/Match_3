@@ -1,4 +1,22 @@
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QFile>
+#include <QDebug>
+#include <cmath>
+#include <QColor>
+#include <QAbstractListModel>
 #include "match3.h"
+
+struct Bubble
+{
+    Bubble(QColor color = "black", bool markedToDelete = false) :
+        m_color(color), m_markedToDelete(markedToDelete) {
+    }
+
+    QColor m_color;
+    bool m_markedToDelete;
+};
 
 Match3::Match3(QObject *parent)
     : QAbstractListModel(parent)
@@ -35,7 +53,7 @@ QVariant Match3::data(const QModelIndex &index, int role) const
 
     switch(role) {
     case ColorRole:
-        return m_bubbles.at(row)->getColor();
+        return m_bubbles.at(row)->m_color;
     }
 
     return QVariant();
@@ -80,19 +98,19 @@ bool Match3::moveHandler(int clicked, int released)
 
     move(clicked, released);
 
-    clickedConnected = connectedBlocks(row_1, col_1, m_bubbles.at(clicked)->getColor(), toDelete);
+    clickedConnected = connectedBlocks(row_1, col_1, m_bubbles.at(clicked)->m_color, toDelete, m_bubbles);
 
     if (clickedConnected >= 3) {
         for(int i = 0; i < toDelete.count(); i++){
-            m_bubbles.at(toDelete.at(i))->setMarkedToDelete(true);
+            m_bubbles.at(toDelete.at(i))->m_markedToDelete = true;
         }
     }
     toDelete.clear();
 
-    releasedConnected = connectedBlocks(row_2, col_2, m_bubbles.at(released)->getColor(), toDelete);
+    releasedConnected = connectedBlocks(row_2, col_2, m_bubbles.at(released)->m_color, toDelete, m_bubbles);
     if (releasedConnected >= 3) {
         for(int i = 0; i < toDelete.count(); i++){
-            m_bubbles.at(toDelete.at(i))->setMarkedToDelete(true);
+            m_bubbles.at(toDelete.at(i))->m_markedToDelete = true;
         }
     }
     toDelete.clear();
@@ -131,13 +149,13 @@ bool Match3::checkAvailableSteps()
                 boardCopy.move(max - 1, min);
             }
 
-            int clickedConnected = connectedBlocks(i, j, boardCopy.at(curIndex)->getColor(), toDelete, boardCopy);
+            int clickedConnected = connectedBlocks(i, j, boardCopy.at(curIndex)->m_color, toDelete, boardCopy);
 
             toDelete.clear();
-            int releasedConnected = connectedBlocks(i + 1, j, boardCopy.at(swapIndex)->getColor(), toDelete, boardCopy);
+            int releasedConnected = connectedBlocks(i + 1, j, boardCopy.at(swapIndex)->m_color, toDelete, boardCopy);
             toDelete.clear();
 
-            deleteBoardCopy(boardCopy);
+            deleteBoard(boardCopy);
 
             if( clickedConnected >= 3 || releasedConnected >= 3 ) {
                 return true;
@@ -166,13 +184,13 @@ bool Match3::checkAvailableSteps()
                 boardCopy.move(max - 1, min);
             }
 
-            int clickedConnected = connectedBlocks(i, j, boardCopy.at(curIndex)->getColor(), toDelete, boardCopy);
+            int clickedConnected = connectedBlocks(i, j, boardCopy.at(curIndex)->m_color/*->getColor()*/, toDelete, boardCopy);
 
             toDelete.clear();
-            int releasedConnected = connectedBlocks(i, j + 1, boardCopy.at(swapIndex)->getColor(), toDelete, boardCopy);
+            int releasedConnected = connectedBlocks(i, j + 1, boardCopy.at(swapIndex)->m_color/*->getColor()*/, toDelete, boardCopy);
             toDelete.clear();
 
-            deleteBoardCopy(boardCopy);
+            deleteBoard(boardCopy);
 
             if( clickedConnected >= 3 || releasedConnected >= 3 ) {
                 return true;
@@ -273,50 +291,23 @@ bool Match3::checkMove(int from, int to) const
     { return false; }
 }
 
-int Match3::connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete)
-{
-
-    if(row >= m_rows || col >= m_columns || row < 0 || col < 0)
-    {
-        return 0; }
-
-    if(toDelete.contains(row * m_columns + col))
-    {
-        return 0; }
-
-    if(m_bubbles.at(row * m_columns + col)->getColor() != color)
-    {
-        return 0; }
-
-    int connected_blocks = 1;
-    toDelete.append(row * m_columns + col);
-
-    connected_blocks += connectedBlocks(row + 1, col, color, toDelete);
-    connected_blocks += connectedBlocks(row - 1, col, color, toDelete);
-    connected_blocks += connectedBlocks(row, col + 1, color, toDelete);
-    connected_blocks += connectedBlocks(row, col - 1, color, toDelete);
-
-    return connected_blocks;
-
-}
-
 int Match3::connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete, QList<Bubble *> &board)
 {
     if(row >= m_rows || col >= m_columns || row < 0 || col < 0)
     {
         return 0; }
 
-    if(toDelete.contains(row * m_columns + col))
+    if(toDelete.contains(getIndex(row, col)))
     {
         return 0; }
 
-    if(board.at(row * m_columns + col)->getColor() != color)
+    if(board.at(getIndex(row, col))->m_color != color)
     {
         return 0; }
 
 
     int connected_blocks = 1;
-    toDelete.append(row * m_columns + col);
+    toDelete.append(getIndex(row, col));
 
     connected_blocks += connectedBlocks(row + 1, col, color, toDelete, board);
     connected_blocks += connectedBlocks(row - 1, col, color, toDelete, board);
@@ -331,20 +322,20 @@ void Match3::fillField()
     emit beginResetModel();
 
     if(!m_bubbles.isEmpty()){
-        deleteBoardCopy(m_bubbles);
+        deleteBoard(m_bubbles);
     }
     for(int i = 0; i < m_rows * m_columns; i++) {
-        m_bubbles.append(new Bubble(nullptr, m_colors.at(qrand() % m_colors.size()), false));
+        m_bubbles.append(new Bubble(m_colors.at(qrand() % m_colors.size()), false));
     }
 
 
     for(int i = 0; i < m_rows; i++){
         for(int j = 0; j < m_columns; j++){
             QVector<int> vector;
-            QColor color = m_bubbles.at(getIndex(i, j))->getColor();
-            while(connectedBlocks(i, j, color, vector) >= 3){
+            QColor color = m_bubbles.at(getIndex(i, j))->m_color;
+            while(connectedBlocks(i, j, color, vector, m_bubbles) >= 3){
                 color = m_colors.at(qrand() % m_colors.size());
-                m_bubbles.at(getIndex(i, j))->setColor(color);
+                m_bubbles.at(getIndex(i, j))->m_color = color;
                 vector.clear();
             }
         }
@@ -356,12 +347,12 @@ QList<Bubble *> Match3::copyBoard()
 {
     QList<Bubble*> boardCopy;
     for(int i = 0; i < m_bubbles.count(); i++){
-        boardCopy.append(new Bubble(nullptr, m_bubbles.at(i)->getColor(), false));
+        boardCopy.append(new Bubble(m_bubbles.at(i)->m_color, false));
     }
     return boardCopy;
 }
 
-void Match3::deleteBoardCopy(QList<Bubble *> &board)
+void Match3::deleteBoard(QList<Bubble *> &board)
 {
     for (int i = 0; i < board.size(); i++){
         delete board.takeAt(i);
@@ -374,14 +365,14 @@ int Match3::deleteBlocks()
 
     for(int i = 0; i < m_rows; i++){
         for(int j = 0; j < m_columns; j++){
-            if(m_bubbles.at(i * m_columns + j)->getMarkedToDelete()){
+            if(m_bubbles.at(i * m_columns + j)->m_markedToDelete){
 
                 emit beginRemoveRows(QModelIndex(), i * m_columns + j, i * m_columns + j);
                 m_bubbles.removeAt(i * m_columns + j);
                 emit endRemoveRows();
 
                 emit beginInsertRows(QModelIndex(), i * m_columns + j, i * m_columns + j);
-                m_bubbles.insert(i * m_columns + j, new Bubble(nullptr, "transparent", false));
+                m_bubbles.insert(i * m_columns + j, new Bubble("transparent", false));
                 emit endInsertRows();
 
                 deleted += 1;
@@ -397,12 +388,12 @@ void Match3::moveToBottom()
 
     for(int col = 0; col < m_columns; col++){
         for(int row = m_rows - 1; row >= 0; row--){
-            if(m_bubbles.at(row * m_columns + col)->getColor() == "transparent") {
+            if(m_bubbles.at(getIndex(row, col))->m_color == "transparent") {
 
-                int ind = row * m_columns + col;
-                int tempInd = row * m_columns + col - m_columns;
+                int ind = getIndex(row, col);
+                int tempInd = getIndex(row, col) - m_columns;
                 while(tempInd >= 0){
-                    if(m_bubbles.at(tempInd)->getColor() != "transparent"){
+                    if(m_bubbles.at(tempInd)->m_color != "transparent"){
 
                         //not called move function, because move can be not by rules
                         int min = ind < tempInd ? ind : tempInd;
@@ -432,14 +423,14 @@ void Match3::moveToBottom()
 void Match3::addNewBubbles()
 {
     for(int col = 0; col < m_columns; col++){
-        while(m_bubbles.at(0 * m_columns + col)->getColor() == "transparent") {
+        while(m_bubbles.at(0 * m_columns + col)->m_color == "transparent") {
 
             emit beginRemoveRows(QModelIndex(), 0 * m_columns + col, 0 * m_columns + col);
             m_bubbles.removeAt(0 * m_columns + col);
             emit endRemoveRows();
 
             emit beginInsertRows(QModelIndex(), 0 * m_columns + col, 0 * m_columns + col);
-            m_bubbles.insert(0 * m_columns + col, new Bubble(nullptr, m_colors.at(qrand() % m_colors.size()), false));
+            m_bubbles.insert(0 * m_columns + col, new Bubble(m_colors.at(qrand() % m_colors.size()), false));
             emit endInsertRows();
 
             moveToBottom();
@@ -452,20 +443,20 @@ bool Match3::checkMatches()
     bool matchExist = false;
 
     for(int i = 0; i < m_bubbles.count(); i++){
-        if(m_bubbles.at(i)->getMarkedToDelete() == false){
+        if(m_bubbles.at(i)->m_markedToDelete == false){
 
-            QColor color = m_bubbles.at(i)->getColor();
+            QColor color = m_bubbles.at(i)->m_color;
             QVector<int> onDelete;
             int temp_row = row(i);
             int temp_col = col(i);
 
-            int connected = connectedBlocks(temp_row, temp_col, color, onDelete);
+            int connected = connectedBlocks(temp_row, temp_col, color, onDelete, m_bubbles);
 
             if(connected >= 3){
                 matchExist = true;
 
                 for(int i = 0; i < onDelete.count(); i++){
-                    m_bubbles.at(onDelete.at(i))->setMarkedToDelete(true);
+                    m_bubbles.at(onDelete.at(i))->m_markedToDelete = true;
                 }
 
                 onDelete.clear();
@@ -478,8 +469,18 @@ bool Match3::checkMatches()
 void Match3::clearBubbleMarks()
 {
     for(int i = 0; i < m_bubbles.count(); i++){
-        m_bubbles.at(i)->setMarkedToDelete(false);
+        m_bubbles.at(i)->m_markedToDelete = false;
     }
+}
+
+int Match3::deleteHandler()
+{
+    int deleted = deleteBlocks();
+    clearBubbleMarks();
+    moveToBottom();
+    addNewBubbles();
+
+    return deleted;
 }
 
 int Match3::row(int index) const

@@ -26,6 +26,8 @@ Item {
         property int spacing
         anchors.centerIn: parent
 
+        onPressAndHold: { root.click() }
+        onReleased: { root.release() }
     }
 
     states: [
@@ -60,15 +62,5 @@ Item {
         }
         alwaysRunToEnd: true
 
-    }
-
-    MouseArea {
-        id: mouseArea
-
-        anchors.fill: parent
-        pressAndHoldInterval: 0
-
-        onPressAndHold: { root.click() }
-        onReleased: { root.release() }
     }
 }

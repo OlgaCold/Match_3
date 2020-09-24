@@ -84,12 +84,12 @@ ApplicationWindow {
             Keys.onRightPressed: hbar.increase()
 
             ScrollBar.vertical: ScrollBar {
-                id: vbar;
+                id: vbar
                 policy: ScrollBar.AlwaysOn
             }
             ScrollBar.horizontal: ScrollBar {
-                id: hbar;
-                policy: ScrollBar.AlwaysOn;
+                id: hbar
+                policy: ScrollBar.AlwaysOn
             }
 
 
@@ -120,7 +120,7 @@ ApplicationWindow {
 
                         if(!board.animationRunning()) {
 
-                        board.choosed = board.choosed + 1
+                            board.choosed = board.choosed + 1
 
                             if(board.choosed === 1)
                             {
@@ -144,16 +144,20 @@ ApplicationWindow {
                             board.first = -1
                         } else {
                             if(board.choosed === 2) {
-                                board.itemAtIndex(board.first).marked = false;
+                                board.itemAtIndex(board.first).marked = false
                                 board.isPressed = false
                                 board.choosed = 0
                                 marked = false
 
                                 if(!game.moveHandler(board.first, board.second)){
-                                    board.itemAtIndex(board.first).animationStart();
-                                    animationStart();
+                                    board.itemAtIndex(board.first).animationStart()
+                                    animationStart()
                                 } else {
                                     root.moves++
+
+                                }
+                                if(!game.checkAvailableSteps()) {
+                                    messageDialog.open()
                                 }
                             }
                         }
@@ -166,19 +170,12 @@ ApplicationWindow {
                         messageDialog.open()
                     }
                     if(game.checkMatches()){
-                        root.score += game.deleteBlocks();
-                        game.clearBubbleMarks();
-                        game.moveToBottom();
-                        game.addNewBubbles();
+                        root.score += game.deleteHandler()
                     }
                 }
 
                 onMoveFinished: {
-
-                    root.score += game.deleteBlocks();
-                    game.clearBubbleMarks();
-                    game.moveToBottom();
-                    game.addNewBubbles();
+                    root.score += game.deleteHandler()
                 }
             }
 

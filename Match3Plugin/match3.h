@@ -1,17 +1,9 @@
 #pragma once
 
 #include <QAbstractListModel>
-#include <QObject>
-#include <QFile>
-#include <QColor>
-#include <QTextStream>
-#include <QDebug>
-#include <QJsonObject>
 #include <QString>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <cmath>
-#include "bubble.h"
+
+struct Bubble;
 
 class Match3 : public QAbstractListModel
 {
@@ -31,16 +23,11 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
 
-public slots:
-    bool newGame(); //return false if no move available
-    bool moveHandler(int clicked, int released); //return true if connected > 2
-    bool checkAvailableSteps(); //brute force algorithm, return true if step available
-
-    bool checkMatches(); //return true if match exist and mark bubbles to delete
-    int deleteBlocks(); //remove and insert transparent blocks by marks
-    void moveToBottom(); //move transparent up
-    void addNewBubbles(); //delete transparent and insert random color bubble
-    void clearBubbleMarks(); // set all Bubble m_markedToDelete to false
+    Q_INVOKABLE bool newGame(); //return false if no move available
+    Q_INVOKABLE bool moveHandler(int clicked, int released); //return true if connected > 2
+    Q_INVOKABLE bool checkAvailableSteps(); //brute force algorithm, return true if step available
+    Q_INVOKABLE bool checkMatches(); //return true if match exist and mark bubbles to delete
+    Q_INVOKABLE int deleteHandler();
 
 private:
     int m_rows;
@@ -48,14 +35,17 @@ private:
     QList<Bubble*> m_bubbles;
     QList<QColor> m_colors;
 
+    int deleteBlocks(); //remove and insert transparent blocks by marks
+    void moveToBottom(); //move transparent up
+    void addNewBubbles(); //delete transparent and insert random color bubble
+    void clearBubbleMarks(); // set all Bubble m_markedToDelete to false
     bool configFromJson(const QString path);
     void createStandartJson(const QString path);
     bool checkMove(int from, int to) const; // return true, if gamer move is valid
-    int connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete); // return number of connected blocks and fill vectop toDelete
     int connectedBlocks(int row, int col, QColor color, QVector<int> &toDelete, QList<Bubble*> &board); //for copy of the Board
     void fillField();
     QList<Bubble*> copyBoard();
-    void deleteBoardCopy(QList<Bubble*> &board);
+    void deleteBoard(QList<Bubble*> &board);
     void move(int clicked, int released);
     int row(int index) const;
     int col(int index) const;
